@@ -1,0 +1,533 @@
+
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const Jma3tiApp());
+}
+
+const Color sand = Color(0xFFF4EBDD);
+const Color green = Color(0xFF174C3C);
+const Color gold = Color(0xFFC69B4B);
+const Color dark = Color(0xFF14231E);
+
+class Jma3tiApp extends StatelessWidget {
+  const Jma3tiApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'JMA3TI',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: sand,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: green,
+          primary: green,
+          secondary: gold,
+        ),
+        fontFamily: 'sans-serif',
+      ),
+      home: const LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final username = TextEditingController();
+
+  @override
+  void dispose() {
+    username.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [green, dark],
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: gold,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Icon(
+                      Icons.groups_rounded,
+                      size: 60,
+                      color: dark,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'جماعتي',
+                    style: TextStyle(
+                      fontSize: 38,
+                      fontWeight: FontWeight.bold,
+                      color: sand,
+                    ),
+                  ),
+                  const Text(
+                    'JMA3TI',
+                    style: TextStyle(
+                      fontSize: 19,
+                      letterSpacing: 5,
+                      color: gold,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'مكانك، جماعتك، وألعابك',
+                    style: TextStyle(color: sand, fontSize: 16),
+                  ),
+                  const SizedBox(height: 45),
+                  TextField(
+                    controller: username,
+                    textDirection: TextDirection.ltr,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: 'اسم المستخدم',
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      prefixIcon: const Icon(
+                        Icons.person_outline,
+                        color: gold,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white.withValues(alpha: 0.10),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: gold,
+                        foregroundColor: dark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (username.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('اكتب اسم المستخدم أولًا'),
+                            ),
+                          );
+                          return;
+                        }
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MainPage(
+                              username: username.text.trim(),
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'دخول تجريبي',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'نسختك الأولى تبدأ هنا',
+                    style: TextStyle(color: Colors.white54),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MainPage extends StatefulWidget {
+  final String username;
+
+  const MainPage({super.key, required this.username});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = [
+      HomeTab(username: widget.username),
+      const RoomsTab(),
+      const GamesTab(),
+      const ChatTab(),
+      ProfileTab(username: widget.username),
+    ];
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: green,
+          foregroundColor: sand,
+          title: const Text(
+            'جماعتي | JMA3TI',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          actions: const [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Icon(Icons.notifications_none),
+            ),
+          ],
+        ),
+        body: pages[selected],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: selected,
+          onDestinationSelected: (index) {
+            setState(() => selected = index);
+          },
+          backgroundColor: Colors.white,
+          indicatorColor: gold.withValues(alpha: 0.25),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'الرئيسية',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.mic_none),
+              selectedIcon: Icon(Icons.mic),
+              label: 'الغرف',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.sports_esports_outlined),
+              selectedIcon: Icon(Icons.sports_esports),
+              label: 'الألعاب',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.chat_bubble_outline),
+              selectedIcon: Icon(Icons.chat_bubble),
+              label: 'الدردشة',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person),
+              label: 'حسابي',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HomeTab extends StatelessWidget {
+  final String username;
+
+  const HomeTab({super.key, required this.username});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(18),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: green,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'مرحبا بك في جماعتك',
+                style: TextStyle(color: gold, fontSize: 15),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                username,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 27,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'اجتمع بأصدقائك، العب وتحدث بالصوت.',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        const SectionTitle(title: 'اكتشف جماعتك'),
+        const SizedBox(height: 12),
+        const FeatureCard(
+          icon: Icons.mic,
+          title: 'الغرف الصوتية',
+          subtitle: 'أنشئ غرفة واجمع أصدقاءك',
+          color: green,
+        ),
+        const FeatureCard(
+          icon: Icons.style,
+          title: 'الألعاب الجماعية',
+          subtitle: 'استعد للتحدي مع جماعتك',
+          color: Color(0xFF8D593A),
+        ),
+        const FeatureCard(
+          icon: Icons.forum_outlined,
+          title: 'الدردشة',
+          subtitle: 'مكان للمحادثات بين الأصدقاء',
+          color: Color(0xFF526B83),
+        ),
+      ],
+    );
+  }
+}
+
+class RoomsTab extends StatelessWidget {
+  const RoomsTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.mic, size: 65, color: green),
+            const SizedBox(height: 16),
+            const Text(
+              'الغرف الصوتية',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text('ستتمكن من إنشاء غرف عامة وخاصة هنا.'),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('سنضيف إنشاء الغرف في الخطوة التالية'),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('إنشاء غرفة'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GamesTab extends StatelessWidget {
+  const GamesTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(18),
+      children: const [
+        SectionTitle(title: 'الألعاب'),
+        SizedBox(height: 14),
+        FeatureCard(
+          icon: Icons.style,
+          title: 'ورق الشدة',
+          subtitle: 'لعبة جماعية قيد التطوير',
+          color: green,
+        ),
+        FeatureCard(
+          icon: Icons.question_answer,
+          title: 'صراحة وتحدي',
+          subtitle: 'أسئلة وتحديات مع الأصدقاء',
+          color: Color(0xFF8D593A),
+        ),
+      ],
+    );
+  }
+}
+
+class ChatTab extends StatelessWidget {
+  const ChatTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.chat_bubble_outline, size: 60, color: green),
+            SizedBox(height: 16),
+            Text(
+              'الدردشة',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('ستظهر محادثاتك هنا بعد ربط الحسابات.'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProfileTab extends StatelessWidget {
+  final String username;
+
+  const ProfileTab({super.key, required this.username});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircleAvatar(
+            radius: 48,
+            backgroundColor: green,
+            child: Icon(Icons.person, size: 55, color: gold),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            username,
+            style: const TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text('ملفك الشخصي'),
+          const SizedBox(height: 24),
+          const Chip(
+            avatar: Icon(Icons.stars, color: gold),
+            label: Text('عضو في جماعتي'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+
+  const SectionTitle({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        color: dark,
+      ),
+    );
+  }
+}
+
+class FeatureCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  const FeatureCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(icon, color: gold, size: 29),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+} 
